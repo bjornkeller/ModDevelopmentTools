@@ -1,8 +1,5 @@
 # virtual env folder
 venv
 
-# test file
-test.py
-
 #project files
 .idea

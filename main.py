@@ -7,6 +7,7 @@ import sys
 import mdt
 
 __VERSION__ = '1.0.0'
+PATH = os.path.abspath(os.path.split(__file__)[0])
 
 OPTIONS = {
     'install': {
@@ -168,8 +169,50 @@ class InputProcessor:
                 self._api.update_from_url(url, clear=False)
 
 
+def setup():
+    if not os.path.isdir(os.path.join(PATH, 'repository')):
+        os.mkdir(os.path.join(PATH, 'repository'))
+    if not os.path.isdir(os.path.join(PATH, 'installed-programs')):
+        os.mkdir(os.path.join(PATH, 'installed-programs'))
+    if not os.path.isdir(os.path.join(PATH, 'installed-programs', 'program-data')):
+        os.mkdir(os.path.join(PATH, 'installed-programs', 'program-data'))
+    if not os.path.isdir(os.path.join(PATH, 'installed-programs', 'package-data')):
+        os.mkdir(os.path.join(PATH, 'installed-programs', 'package-data'))
+    if not os.path.isdir(os.path.join(PATH, '.tmp')):
+        os.mkdir(os.path.join(PATH, '.tmp'))
+    if not os.path.isfile(os.path.join(PATH, 'installed-programs', 'package-data', 'version-config.json')):
+        with open(os.path.join(PATH, 'installed-programs', 'package-data', 'version-config.json'), 'w') as f:
+            json.dump([], f, indent=2)
+
+
+def check_setup():
+    ret = True
+    if not os.path.isdir(os.path.join(PATH, 'repository')):
+        ret = False
+    if not os.path.isdir(os.path.join(PATH, 'installed-programs')):
+        ret = False
+    if not os.path.isdir(os.path.join(PATH, '.tmp')):
+        ret = False
+    if not os.path.isdir(os.path.join(PATH, 'installed-programs', 'program-data')):
+        ret = False
+    if not os.path.isdir(os.path.join(PATH, 'installed-programs', 'package-data')):
+        ret = False
+    if not os.path.isfile(os.path.join(PATH, 'installed-programs', 'package-data', 'version-config.json')):
+        ret = False
+    return ret
+
+
 if __name__ == '__main__':
-    package_api = mdt.api.Api(os.path.abspath(os.path.split(__file__)[0]), verbose=True)
+    if CONFIG['root'] is True and os.geteuid() == 0:
+        setup()
+    elif CONFIG['root'] is False:
+        setup()
+    else:
+        valid = check_setup()
+        if valid is False:
+            print('ERR: Missing directories. Run as root to rebuild them.')
+            sys.exit(0)
+    package_api = mdt.api.Api(PATH, verbose=True)
     command_list = mdt.argument_parser.Parser(OPTIONS, VERSION, HELP).get_parsed()
     processor = InputProcessor(command_list, package_api, root=CONFIG['root'])
     processor.run()

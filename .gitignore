@@ -3,3 +3,5 @@ venv
 
 #project files
 .idea
+.tmp
+installed-programs

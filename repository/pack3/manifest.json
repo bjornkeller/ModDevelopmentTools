@@ -1,0 +1,10 @@
+{
+  "name": "decompiler",
+  "versions": ["2022.1"],
+  "default-version": "2022.1",
+  "add-launcher": false,
+  "icon": null,
+  "install-script": "install.py",
+  "remove-script": "remove.py",
+  "start-script": "start.py"
+}

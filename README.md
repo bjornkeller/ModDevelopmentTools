@@ -24,5 +24,4 @@ Step 3. Enter into the terminal 'python3 install.py' and hit enter.
 
 Step 4. When prompted, enter the directory to install to or leave blank for default.
 
-You can download pre-built version from: https://ln5.sync.com/dl/1134ec450/i6n4d94x-iteuxuyd-ws7fnbd4-56td8fur
 

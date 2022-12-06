@@ -41,14 +41,14 @@ def get_input():
 
 def install():
     stage_dir = os.path.abspath(os.path.split(__file__)[0])
-    shutil.copytree(os.path.join(stage_dir, '../mdt'), os.path.join(INSTALL_DIR, '../mdt'))
+    shutil.copytree(os.path.join(stage_dir, 'mdt'), os.path.join(INSTALL_DIR, 'mdt'))
     if ROOT_NEEDED is True:
-        with open(os.path.join(INSTALL_DIR, '../mdt', 'config.json'), 'r') as f:
+        with open(os.path.join(INSTALL_DIR, 'mdt', 'config.json'), 'r') as f:
             config = json.load(f)
         config['root'] = ROOT_NEEDED
-        with open(os.path.join(INSTALL_DIR, '../mdt', 'config.json'), 'w') as f:
+        with open(os.path.join(INSTALL_DIR, 'mdt', 'config.json'), 'w') as f:
             json.dump(config, f, indent=2)
-        os.symlink(os.path.join(INSTALL_DIR, '../mdt', 'main'), os.path.join('/usr', 'bin', '../mdt'))
+        os.symlink(os.path.join(INSTALL_DIR, 'mdt', 'main'), os.path.join('/usr', 'bin', 'mdt'))
 
 
 def cleanup():

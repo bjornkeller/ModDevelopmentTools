@@ -5,3 +5,4 @@ venv
 .idea
 .tmp
 installed-programs
+test.py

@@ -9,7 +9,7 @@ How to build from source:
  
 Step 1. Open a terminal and cd to the project directory
 
-Step 2. Make sure python3 and python requests library are installed
+Step 2. Make sure python3, python requests and pyinstaller libraries are installed
 
 Step 3. Enter into the terminal 'python3 build.py' and hit enter. 
 A folder named mdt_{version} will be created. This contains the built program.
@@ -23,4 +23,6 @@ Step 2. Make sure python3 is installed
 Step 3. Enter into the terminal 'python3 install.py' and hit enter.
 
 Step 4. When prompted, enter the directory to install to or leave blank for default.
+
+You can download pre-built version from: https://ln5.sync.com/dl/1134ec450/i6n4d94x-iteuxuyd-ws7fnbd4-56td8fur
 

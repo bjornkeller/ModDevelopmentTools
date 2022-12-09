@@ -3,6 +3,7 @@
 import os
 import json
 import shutil
+import sys
 import uuid
 import subprocess
 
@@ -10,6 +11,10 @@ from .repository import Repository, MissingFileError, InvalidManifestError
 
 
 class NoInstallCandidate(Exception):
+    pass
+
+
+class ErrorInInstallScript(Exception):
     pass
 
 
@@ -239,25 +244,11 @@ def install(package_name: str, version: str = None, path: str = None, verbose: b
 
         # run install script
         try:
-            o = str(subprocess.check_output(['python3', install_script, manifest['program-dir'], manifest['version']]))
-            if json.loads(o[2:-1]) is True:
-                print('Installed successfully!')
-            else:
-                cleanup_broken()
-                if verbose:
-                    print('ERR: install script returned \'failure to install\'\nInstall failed!')
-                    return
-                else:
-                    raise FailedToInstallError
-        except subprocess.CalledProcessError as e:
-            cleanup_broken()
-            if verbose:
-                print('ERR: error running install script\nInstall failed!')
-                return
-            else:
-                raise e
-
+            subprocess.call(['python3', install_script, manifest['program-dir'], manifest['version']], stderr=subprocess.PIPE)
+        except Exception:
+            raise ErrorInInstallScript
         # configure version
+        edit_version_config()
     except AlreadyInstalledError as e:
         if verbose:
             print('ERR: package already installed')
@@ -270,6 +261,16 @@ def install(package_name: str, version: str = None, path: str = None, verbose: b
             return
         else:
             raise e
+    except ErrorInInstallScript as e:
+        cleanup_broken()
+        if verbose:
+            print('ERR: error in install script\nInstall failed!')
+            return
+        else:
+            raise e
+    except KeyboardInterrupt:
+        cleanup_broken()
+        sys.exit(0)
     except Exception as e:
         cleanup_broken()
         if verbose:
@@ -277,7 +278,6 @@ def install(package_name: str, version: str = None, path: str = None, verbose: b
             return
         else:
             raise e
-    edit_version_config()
 
 
 def uninstall(package_name: str, version: str = None, path: str = None, verbose: bool = False):
@@ -351,19 +351,19 @@ def uninstall(package_name: str, version: str = None, path: str = None, verbose:
         package_path = os.path.split(uninstall_pack['path'])[0]
         program_date_path = manifest['program-dir']
         uninstall_script = os.path.join(package_path, manifest['remove-script'])
-
-        o = str(subprocess.check_output(['python3', uninstall_script, program_date_path, version]))
-        if json.loads(o[2:-1]) is True:
-            pass
-        else:
+        try:
+            subprocess.call(['python3', uninstall_script, program_date_path, version], stderr=subprocess.PIPE)
+        except Exception as e:
             if verbose:
-                print('ERR: error running uninstall script\nUninstall failed!')
-                return
+                print('ERR: error running uninstall script')
             else:
-                raise FailedToUninstallError
+                raise e
         cleanup()
         configure_version()
         print('Uninstalled successfully!')
+    except KeyboardInterrupt:
+        cleanup()
+        sys.exit(0)
     except Exception as e:
         if verbose:
             print('ERR: error in uninstall\nUninstall failed!')
